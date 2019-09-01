@@ -5,8 +5,10 @@
     <script src="wasm_exec.js"></script>
     <script type="text/javascript">
 
+document.coinex = new Object();
+
 function MyFunction(text) {
-	document.wasmFunc("wasmFunc == "+text)
+	document.coinex.wasmFunc1("wasmFunc == "+text)
 }
 
 window.fromWasm = function(text) {

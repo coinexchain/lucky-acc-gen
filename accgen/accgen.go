@@ -58,7 +58,7 @@ func tryAddress(prefix string, resAtomic atomic.Value, wg *sync.WaitGroup, globa
 			count := atomic.AddUint64(globalCounter, BatchCount)
 			if count%BigBatchCount==0 {
 				percent := 100.0*float64(count)/totalTry
-				fmt.Printf("%d times have been tried, estimated progress: %%%.2f\n", count, percent)
+				fmt.Printf("%d times have been tried, estimated progress: %.2f%%\n", count, percent)
 			}
 		}
 		addr, mnemonic, err := getAddress(entropy)
@@ -80,6 +80,13 @@ func tryAddress(prefix string, resAtomic atomic.Value, wg *sync.WaitGroup, globa
 	wg.Done()
 }
 
+// NewFundraiserParams creates a BIP 44 parameter object from the params:
+// m / 44' / coinType' / account' / 0 / address_index
+// The fixed parameters (purpose', coin_type', and change) are determined by what was used in the fundraiser.
+//func NewFundraiserParams(account, coinType, addressIdx uint32) *BIP44Params {
+//	return NewParams(44, coinType, account, false, addressIdx)
+//}
+
 func getAddress(entropy []byte) (string,string,error) {
 	mnemonic, err := bip39.NewMnemonic(entropy)
 	if err != nil {
@@ -88,7 +95,7 @@ func getAddress(entropy []byte) (string,string,error) {
 
 	DefaultBIP39Passphrase := ""
 	seed := bip39.NewSeed(mnemonic, DefaultBIP39Passphrase)
-	fullHdPath := "44'/688'/0'/0/0"
+	fullHdPath := "44'/688'/0'/0/0" //coinType=688 account=0 addressIdx=0
 	masterPriv, ch := hd.ComputeMastersFromSeed(seed)
 	derivedPriv, err := hd.DerivePrivateKeyForPath(masterPriv, ch, fullHdPath)
 	pubk := secp256k1.PrivKeySecp256k1(derivedPriv).PubKey()

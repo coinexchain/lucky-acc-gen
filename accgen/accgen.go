@@ -19,7 +19,7 @@ type Result struct {
 	mnemonic string
 }
 
-func TryAddressParallel(prefix string, numCpu int) (string, string) {
+func TryAddressParallel(prefix, suffix string, numCpu int) (string, string) {
 	var totalTry float64
 	totalTry = 1.0
 	n := len(prefix) - len("coinex1")
@@ -33,7 +33,7 @@ func TryAddressParallel(prefix string, numCpu int) (string, string) {
 	var wg sync.WaitGroup
 	wg.Add(numCpu)
 	for i := 0; i < numCpu; i++ {
-		go tryAddress(prefix, resAtomic, &wg, &globalCounter, totalTry)
+		go tryAddress(prefix, suffix, resAtomic, &wg, &globalCounter, totalTry)
 	}
 	wg.Wait()
 	return resPtr.addr, resPtr.mnemonic
@@ -42,7 +42,9 @@ func TryAddressParallel(prefix string, numCpu int) (string, string) {
 const BatchCount = 1000
 const BigBatchCount = 10 * BatchCount
 
-func tryAddress(prefix string, resAtomic atomic.Value, wg *sync.WaitGroup, globalCounter *uint64, totalTry float64) {
+func tryAddress(prefix, suffix string,
+	resAtomic atomic.Value, wg *sync.WaitGroup, globalCounter *uint64, totalTry float64) {
+
 	entropy, err := bip39.NewEntropy(256)
 	if err != nil {
 		panic(err.Error())
@@ -64,7 +66,7 @@ func tryAddress(prefix string, resAtomic atomic.Value, wg *sync.WaitGroup, globa
 		if err != nil {
 			panic(err.Error())
 		}
-		if strings.HasPrefix(addr, prefix) {
+		if strings.HasPrefix(addr, prefix) && strings.HasSuffix(addr, suffix) {
 			resPtr := resAtomic.Load().(*Result)
 			resPtr.found = true
 			resPtr.addr = addr

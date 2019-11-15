@@ -11,6 +11,8 @@ import (
 	"github.com/coinexchain/lucky-acc-gen/accgen"
 )
 
+const addrPrefix = "coinex1"
+
 var bech32Chars map[rune]bool
 
 func init() {
@@ -25,8 +27,13 @@ func main() {
 
 	coreCount := askCoreCount()
 	prefix := askPrefix()
+	suffix := askSuffix()
 
-	addr, mnemonic := accgen.TryAddressParallel(prefix, coreCount)
+	if n := len(prefix + suffix); n > len(addrPrefix)+7 {
+		fmt.Printf("\nWARNING! you specified %d characters totally. It would take very long time to compute!\n", n)
+	}
+
+	addr, mnemonic := accgen.TryAddressParallel(prefix, suffix, coreCount)
 	fmt.Printf("Mnemonic: %s\n", mnemonic)
 	fmt.Printf("Addr: %s\n", addr)
 	fmt.Print("Press Enter to Exit")
@@ -57,26 +64,43 @@ func askCoreCount() int {
 }
 
 func askPrefix() string {
-	prefix := "coinex1"
+	prefix := addrPrefix
 
 	for {
-		fmt.Print("Please the enter several characters after \"coinex1\": ")
+		fmt.Print("Please enter several characters after \"coinex1\": ")
 		var input string
 		fmt.Scanln(&input)
 		input = strings.TrimSpace(input)
 		if len(input) == 0 {
 			fmt.Printf("Nothting is entered!\n")
-			continue
+			//continue
 		}
 		if isValid(input) {
-			if n := len(input); n > 7 {
-				fmt.Printf("\nWARNING! you specified %d characters. It would take very long time to compute!\n", n)
-			}
 			prefix = prefix + input
 			break
 		}
 	}
 	return prefix
+}
+
+func askSuffix() string {
+	suffix := ""
+
+	for {
+		fmt.Print("Please enter address postfix: ")
+		var input string
+		fmt.Scanln(&input)
+		input = strings.TrimSpace(input)
+		if len(input) == 0 {
+			fmt.Printf("Nothting is entered!\n")
+			//continue
+		}
+		if isValid(input) {
+			suffix = input
+			break
+		}
+	}
+	return suffix
 }
 
 func isValid(str string) bool {

@@ -22,7 +22,7 @@ type Result struct {
 func TryAddressParallel(prefix, suffix string, numCpu int) (string, string) {
 	var totalTry float64
 	totalTry = 1.0
-	n := len(prefix) - len("coinex1")
+	n := len(prefix+suffix) - len("coinex1")
 	for i := 0; i < n; i++ {
 		totalTry *= 32.0
 	}

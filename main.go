@@ -14,6 +14,18 @@ import (
 func main() {
 	sdk.GetConfig().SetBech32PrefixForAccount("coinex", "coinexpub")
 
+	coreCount := askCoreCount()
+	prefix := askPrefix()
+
+	addr, mnemonic := accgen.TryAddressParallel(prefix, coreCount)
+	fmt.Printf("Mnemonic: %s\n", mnemonic)
+	fmt.Printf("Addr: %s\n", addr)
+	fmt.Print("Press Enter to Exit")
+	var input string
+	fmt.Scanln(&input)
+}
+
+func askCoreCount() int {
 	coreCount := runtime.NumCPU()
 	for {
 		fmt.Printf("Please enter the number of cpu cores you want to use (you have %d cores, press enter to use all the cores): ", coreCount)
@@ -32,14 +44,7 @@ func main() {
 			fmt.Printf("Invalid input. Please enter a digit.\n")
 		}
 	}
-
-	prefix := askPrefix()
-	addr, mnemonic := accgen.TryAddressParallel(prefix, coreCount)
-	fmt.Printf("Mnemonic: %s\n", mnemonic)
-	fmt.Printf("Addr: %s\n", addr)
-	fmt.Print("Press Enter to Exit")
-	var input string
-	fmt.Scanln(&input)
+	return coreCount
 }
 
 func askPrefix() string {

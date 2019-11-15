@@ -33,6 +33,16 @@ func main() {
 		}
 	}
 
+	prefix := askPrefix()
+	addr, mnemonic := accgen.TryAddressParallel(prefix, coreCount)
+	fmt.Printf("Mnemonic: %s\n", mnemonic)
+	fmt.Printf("Addr: %s\n", addr)
+	fmt.Print("Press Enter to Exit")
+	var input string
+	fmt.Scanln(&input)
+}
+
+func askPrefix() string {
 	prefix := "coinex1"
 	validChars := make(map[rune]bool)
 	for _, c := range "023456789acdefghjklmnpqrstuvwxyz" {
@@ -56,18 +66,12 @@ func main() {
 			}
 		}
 		if isValid {
-			if len(input) > 7 {
-				fmt.Printf("\nWARNING! you specified %d characters. It would take very long time to compute!\n")
+			if n := len(input); n > 7 {
+				fmt.Printf("\nWARNING! you specified %d characters. It would take very long time to compute!\n", n)
 			}
 			prefix = prefix + input
 			break
 		}
 	}
-
-	addr, mnemonic := accgen.TryAddressParallel(prefix, coreCount)
-	fmt.Printf("Mnemonic: %s\n", mnemonic)
-	fmt.Printf("Addr: %s\n", addr)
-	fmt.Print("Press Enter to Exit")
-	var input string
-	fmt.Scanln(&input)
+	return prefix
 }

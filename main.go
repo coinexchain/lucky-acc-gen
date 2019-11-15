@@ -11,6 +11,15 @@ import (
 	"github.com/coinexchain/lucky-acc-gen/accgen"
 )
 
+var bech32Chars map[rune]bool
+
+func init() {
+	bech32Chars = make(map[rune]bool)
+	for _, c := range "023456789acdefghjklmnpqrstuvwxyz" {
+		bech32Chars[c] = true
+	}
+}
+
 func main() {
 	sdk.GetConfig().SetBech32PrefixForAccount("coinex", "coinexpub")
 
@@ -49,10 +58,7 @@ func askCoreCount() int {
 
 func askPrefix() string {
 	prefix := "coinex1"
-	validChars := make(map[rune]bool)
-	for _, c := range "023456789acdefghjklmnpqrstuvwxyz" {
-		validChars[c] = true
-	}
+
 	for {
 		fmt.Print("Please the enter several characters after \"coinex1\": ")
 		var input string
@@ -62,15 +68,7 @@ func askPrefix() string {
 			fmt.Printf("Nothting is entered!\n")
 			continue
 		}
-		isValid := true
-		for _, c := range input {
-			if _, ok := validChars[c]; !ok {
-				fmt.Printf("Invalid character: %s\n", strconv.QuoteRune(c))
-				isValid = false
-				break
-			}
-		}
-		if isValid {
+		if isValid(input) {
 			if n := len(input); n > 7 {
 				fmt.Printf("\nWARNING! you specified %d characters. It would take very long time to compute!\n", n)
 			}
@@ -79,4 +77,14 @@ func askPrefix() string {
 		}
 	}
 	return prefix
+}
+
+func isValid(str string) bool {
+	for _, c := range str {
+		if _, ok := bech32Chars[c]; !ok {
+			fmt.Printf("Invalid character: %s\n", strconv.QuoteRune(c))
+			return false
+		}
+	}
+	return true
 }

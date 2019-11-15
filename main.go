@@ -1,18 +1,18 @@
 package main
 
-
 import (
 	"fmt"
 	"runtime"
-	"strings"
 	"strconv"
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/coinexchain/lucky-acc-gen/accgen"
 )
 
 func main() {
-	sdk.GetConfig().SetBech32PrefixForAccount("coinex","coinexpub")
+	sdk.GetConfig().SetBech32PrefixForAccount("coinex", "coinexpub")
 
 	coreCount := runtime.NumCPU()
 	for {
@@ -20,7 +20,7 @@ func main() {
 		var input string
 		fmt.Scanln(&input)
 		input = strings.TrimSpace(input)
-		if len(input)==0 {
+		if len(input) == 0 {
 			break
 		}
 		if n, err := strconv.ParseUint(input, 10, 32); err == nil {
@@ -36,14 +36,14 @@ func main() {
 	prefix := "coinex1"
 	validChars := make(map[rune]bool)
 	for _, c := range "023456789acdefghjklmnpqrstuvwxyz" {
-		validChars[c]=true
+		validChars[c] = true
 	}
 	for {
 		fmt.Print("Please the enter several characters after \"coinex1\": ")
 		var input string
 		fmt.Scanln(&input)
 		input = strings.TrimSpace(input)
-		if len(input)==0 {
+		if len(input) == 0 {
 			fmt.Printf("Nothting is entered!\n")
 			continue
 		}
@@ -56,10 +56,10 @@ func main() {
 			}
 		}
 		if isValid {
-			if len(input)>7 {
+			if len(input) > 7 {
 				fmt.Printf("\nWARNING! you specified %d characters. It would take very long time to compute!\n")
 			}
-			prefix = prefix+input
+			prefix = prefix + input
 			break
 		}
 	}

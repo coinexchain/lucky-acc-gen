@@ -2,14 +2,15 @@ package accgen
 
 import (
 	"fmt"
-	"sync"
 	"strings"
+	"sync"
 	"sync/atomic"
+
+	"golang.org/x/crypto/blake2b"
 
 	bip39 "github.com/cosmos/go-bip39"
 
 	"github.com/coinexchain/polarbear/keybase"
-	"golang.org/x/crypto/blake2b"
 )
 
 type Result struct {
@@ -21,8 +22,8 @@ type Result struct {
 func TryAddressParallel(prefix string, numCpu int) (string, string) {
 	var totalTry float64
 	totalTry = 1.0
-	n := len(prefix)-len("coinex1")
-	for i:=0; i<n; i++ {
+	n := len(prefix) - len("coinex1")
+	for i := 0; i < n; i++ {
 		totalTry *= 32.0
 	}
 	resPtr := &Result{}
@@ -31,7 +32,7 @@ func TryAddressParallel(prefix string, numCpu int) (string, string) {
 	resAtomic.Store(resPtr)
 	var wg sync.WaitGroup
 	wg.Add(numCpu)
-	for i:=0; i<numCpu; i++ {
+	for i := 0; i < numCpu; i++ {
 		go tryAddress(prefix, resAtomic, &wg, &globalCounter, totalTry)
 	}
 	wg.Wait()
@@ -39,7 +40,7 @@ func TryAddressParallel(prefix string, numCpu int) (string, string) {
 }
 
 const BatchCount = 1000
-const BigBatchCount = 10*BatchCount
+const BigBatchCount = 10 * BatchCount
 
 func tryAddress(prefix string, resAtomic atomic.Value, wg *sync.WaitGroup, globalCounter *uint64, totalTry float64) {
 	entropy, err := bip39.NewEntropy(256)
@@ -48,14 +49,14 @@ func tryAddress(prefix string, resAtomic atomic.Value, wg *sync.WaitGroup, globa
 	}
 	counter := 0
 	for {
-		if counter%BatchCount==0 {
+		if counter%BatchCount == 0 {
 			resPtr := resAtomic.Load().(*Result)
 			if resPtr.found {
 				break
 			}
 			count := atomic.AddUint64(globalCounter, BatchCount)
-			if count%BigBatchCount==0 {
-				percent := 100.0*float64(count)/totalTry
+			if count%BigBatchCount == 0 {
+				percent := 100.0 * float64(count) / totalTry
 				fmt.Printf("%d times have been tried, estimated progress: %.2f%%\n", count, percent)
 			}
 		}
@@ -77,4 +78,3 @@ func tryAddress(prefix string, resAtomic atomic.Value, wg *sync.WaitGroup, globa
 	}
 	wg.Done()
 }
-

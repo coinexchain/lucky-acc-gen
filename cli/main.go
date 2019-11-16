@@ -33,7 +33,9 @@ func main() {
 		fmt.Printf("\nWARNING! you specified %d characters totally. It would take very long time to compute!\n", n)
 	}
 
-	addr, mnemonic := accgen.TryAddressParallel(prefix, suffix, coreCount)
+	addr, mnemonic := accgen.TryAddressParallel(prefix, suffix, func(s string) {
+		fmt.Print(s)
+	}, coreCount)
 	fmt.Printf("Mnemonic: %s\n", mnemonic)
 	fmt.Printf("Addr: %s\n", addr)
 	fmt.Print("Press Enter to Exit")

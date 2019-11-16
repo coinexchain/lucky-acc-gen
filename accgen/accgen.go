@@ -19,7 +19,7 @@ type Result struct {
 	mnemonic string
 }
 
-func TryAddressParallel(prefix, suffix string, numCpu int) (string, string) {
+func TryAddressParallel(prefix, suffix string, repFn func(string), numCpu int) (string, string) {
 	var totalTry float64
 	totalTry = 1.0
 	n := len(prefix+suffix) - len("coinex1")
@@ -33,7 +33,7 @@ func TryAddressParallel(prefix, suffix string, numCpu int) (string, string) {
 	var wg sync.WaitGroup
 	wg.Add(numCpu)
 	for i := 0; i < numCpu; i++ {
-		go tryAddress(prefix, suffix, resAtomic, &wg, &globalCounter, totalTry)
+		go tryAddress(prefix, suffix, repFn, resAtomic, &wg, &globalCounter, totalTry)
 	}
 	wg.Wait()
 	return resPtr.addr, resPtr.mnemonic
@@ -42,7 +42,7 @@ func TryAddressParallel(prefix, suffix string, numCpu int) (string, string) {
 const BatchCount = 1000
 const BigBatchCount = 10 * BatchCount
 
-func tryAddress(prefix, suffix string,
+func tryAddress(prefix, suffix string, repFn func(string),
 	resAtomic atomic.Value, wg *sync.WaitGroup, globalCounter *uint64, totalTry float64) {
 
 	entropy, err := bip39.NewEntropy(256)
@@ -59,7 +59,8 @@ func tryAddress(prefix, suffix string,
 			count := atomic.AddUint64(globalCounter, BatchCount)
 			if count%BigBatchCount == 0 {
 				percent := 100.0 * float64(count) / totalTry
-				fmt.Printf("%d times have been tried, estimated progress: %.2f%%\n", count, percent)
+				s := fmt.Sprintf("%d times have been tried, estimated progress: %.2f%%\n", count, percent)
+				repFn(s)
 			}
 		}
 		addr, mnemonic, err := keybase.GetAddressFromEntropy(entropy)

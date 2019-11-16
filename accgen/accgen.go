@@ -3,6 +3,7 @@ package accgen
 import (
 	"fmt"
 	"strings"
+	"strconv"
 	"sync"
 	"sync/atomic"
 
@@ -12,6 +13,28 @@ import (
 
 	"github.com/coinexchain/polarbear/keybase"
 )
+
+func CheckValid(str string) (string, bool) {
+	for _, c := range str {
+		if _, ok := bech32Chars[c]; !ok {
+			s := fmt.Sprintf("Invalid character: %s", strconv.QuoteRune(c))
+			return s, false
+		}
+	}
+	return "", true
+}
+
+const AddrPrefix = "coinex1"
+
+var bech32Chars map[rune]bool
+
+func init() {
+	bech32Chars = make(map[rune]bool)
+	for _, c := range "023456789acdefghjklmnpqrstuvwxyz" {
+		bech32Chars[c] = true
+	}
+}
+
 
 type Result struct {
 	found    bool

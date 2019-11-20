@@ -1,7 +1,6 @@
 package accgen
 
 import (
-	"fmt"
 	"strings"
 	"strconv"
 	"sync"
@@ -17,8 +16,7 @@ import (
 func CheckValid(str string) (string, bool) {
 	for _, c := range str {
 		if _, ok := bech32Chars[c]; !ok {
-			s := fmt.Sprintf("Invalid character: %s", strconv.QuoteRune(c))
-			return s, false
+			return strconv.QuoteRune(c), false
 		}
 	}
 	return "", true
@@ -42,7 +40,7 @@ type Result struct {
 	mnemonic string
 }
 
-func TryAddressParallel(prefix, suffix string, repFn func(string), numCpu int) (string, string) {
+func TryAddressParallel(prefix, suffix string, repFn func(uint64, float64), numCpu int) (string, string) {
 	var totalTry float64
 	totalTry = 1.0
 	n := len(prefix+suffix) - len("coinex1")
@@ -65,7 +63,7 @@ func TryAddressParallel(prefix, suffix string, repFn func(string), numCpu int) (
 const BatchCount = 1000
 const BigBatchCount = 10 * BatchCount
 
-func tryAddress(prefix, suffix string, repFn func(string),
+func tryAddress(prefix, suffix string, repFn func(uint64, float64),
 	resAtomic atomic.Value, wg *sync.WaitGroup, globalCounter *uint64, totalTry float64) {
 
 	entropy, err := bip39.NewEntropy(256)
@@ -82,8 +80,7 @@ func tryAddress(prefix, suffix string, repFn func(string),
 			count := atomic.AddUint64(globalCounter, BatchCount)
 			if count%BigBatchCount == 0 {
 				percent := 100.0 * float64(count) / totalTry
-				s := fmt.Sprintf("%d times have been tried, estimated progress: %.2f%%\n", count, percent)
-				repFn(s)
+				repFn(count, percent)
 			}
 		}
 		addr, mnemonic, err := keybase.GetAddressFromEntropy(entropy)

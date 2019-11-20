@@ -22,8 +22,8 @@ func main() {
 		fmt.Printf("\nWARNING! you specified %d characters totally. It would take very long time to compute!\n", n)
 	}
 
-	addr, mnemonic := accgen.TryAddressParallel(prefix, suffix, func(s string) {
-		fmt.Print(s)
+	addr, mnemonic := accgen.TryAddressParallel(prefix, suffix, func(count uint64, percent float64) {
+		fmt.Printf("%d times have been tried, estimated progress: %.2f%%\n", count, percent)
 	}, coreCount)
 	fmt.Printf("Mnemonic: %s\n", mnemonic)
 	fmt.Printf("Addr: %s\n", addr)
@@ -71,7 +71,7 @@ func askPrefix() string {
 			prefix = prefix + input
 			break
 		} else {
-			fmt.Println(s)
+			fmt.Sprintf("Invalid character: %s\n", s)
 		}
 	}
 	return prefix

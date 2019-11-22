@@ -1,3 +1,5 @@
 .idea
 *.swp
 *.wasm
+lucky-acc-gen-cli
+lucky-acc-gen-gui

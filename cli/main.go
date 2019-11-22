@@ -99,4 +99,3 @@ func askSuffix() string {
 	}
 	return suffix
 }
-

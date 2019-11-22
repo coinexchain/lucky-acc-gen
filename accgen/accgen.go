@@ -1,8 +1,8 @@
 package accgen
 
 import (
-	"strings"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -32,7 +32,6 @@ func init() {
 		bech32Chars[c] = true
 	}
 }
-
 
 type Result struct {
 	found    bool

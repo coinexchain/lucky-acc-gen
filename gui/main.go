@@ -6,8 +6,8 @@ import (
 
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cloudfoundry/jibber_jabber"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/qor/i18n"
 
 	"github.com/coinexchain/lucky-acc-gen/accgen"
@@ -30,14 +30,14 @@ func T(s string) string {
 
 func add(key, en, cn string) {
 	I18n.AddTranslation(&i18n.Translation{
-		Key: key,
+		Key:    key,
 		Locale: "en-US",
-		Value: en,
+		Value:  en,
 	})
 	I18n.AddTranslation(&i18n.Translation{
-		Key: key,
+		Key:    key,
 		Locale: "zh-CN",
-		Value: cn,
+		Value:  cn,
 	})
 }
 
@@ -56,15 +56,15 @@ func init() {
 	add("progress", "Progress:", "进展：")
 	add("generate", "Generate!", "生成！")
 	add("line1", "Please enter the prefix and suffix of your desired address below.",
-	"请在下方输入您所期待的地址的前缀和后缀。")
+		"请在下方输入您所期待的地址的前缀和后缀。")
 	add("line2", "Prefix is the characters coming immediately after \"coinex1\".",
-	"前缀是指紧接着\"coinex1\"出现的若干字符。")
+		"前缀是指紧接着\"coinex1\"出现的若干字符。")
 	add("line3", "Suffix is the last few characters at the ending of an address.",
-	"后缀是指地址末尾的若干字符。")
+		"后缀是指地址末尾的若干字符。")
 	add("line4", "Valid characters in a bech32 address are '023456789acdefghjklmnpqrstuvwxyz'.",
-	"请注意在bech32格式的地址中，只有这些字符是合法的：'023456789acdefghjklmnpqrstuvwxyz'")
+		"请注意在bech32格式的地址中，只有这些字符是合法的：'023456789acdefghjklmnpqrstuvwxyz'")
 	add("line5", "Please note 'b', 'i', 'o' and '1' are not valid after \"coinex1\".",
-	"也就是说，这几个字符不能出现在\"coinex1\"之后：b, i, o, 1")
+		"也就是说，这几个字符不能出现在\"coinex1\"之后：b, i, o, 1")
 }
 
 func run() {
@@ -153,4 +153,3 @@ func main() {
 	sdk.GetConfig().SetBech32PrefixForAccount("coinex", "coinexpub")
 	ui.Main(setupUI)
 }
-
